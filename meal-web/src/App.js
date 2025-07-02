@@ -17,6 +17,12 @@ function App() {
   }
 
   return (
+<>
+    <Header />
+    <main>
+        <Meals />
+      </main>
+    </>
     // <CartProvider>
     //   {cartIsShown && <Cart onClose={hideCartHandler} />}
     //   <Header onShowCart={showCartHandler} />
@@ -24,12 +30,8 @@ function App() {
       //   <Meals />
       // </main>
     // </CartProvider>
-<>
-    <Header />
-    <main>
-        <Meals />
-      </main>
-    </>
+
+    
   );
 }
 
