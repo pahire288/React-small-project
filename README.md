@@ -1,1 +1,0 @@
-React Small Projects This repository contains a collection of small React projects created for practice. Each project is designed to reinforce core React concepts and improve development skills through hands-on experience.
