@@ -1,0 +1,14 @@
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.add {
+  padding: 8px 16px;
+  
+  color: black;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
