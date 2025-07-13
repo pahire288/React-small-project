@@ -1,24 +1,64 @@
-.App {
+.app-container {
   text-align: center;
-  margin-top: 50px;
+  padding: 20px;
+  font-family: Arial, sans-serif;
 }
 
-button {
+h1 {
+  color: #333;
+}
+
+.fetch-btn,
+.cancel-btn {
   padding: 10px 20px;
-  font-size: 16px;
+  margin: 10px;
+  font-size: 1rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
-  margin-bottom: 20px;
 }
 
-ul {
-  list-style: none;
-  padding: 0;
+.fetch-btn:hover,
+.cancel-btn:hover {
+  background-color: #45a049;
 }
 
-li {
+.spinner {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #4CAF50;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
   margin: 20px auto;
+  animation: spin 1s linear infinite;
 }
 
-img {
-  border-radius: 10px;
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error {
+  color: red;
+  margin: 10px;
+}
+
+.retry-container {
+  margin: 20px;
+}
+
+.data-list {
+  list-style-type: none;
+  padding: 0;
+  max-width: 600px;
+  margin: 20px auto;
+  text-align: left;
+}
+
+.data-list li {
+  background-color: #f4f4f4;
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 5px;
 }
