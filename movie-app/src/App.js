@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './App.css'; // Import CSS
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import './App.css';
 
 function App() {
   const [data, setData] = useState(null);
@@ -8,10 +8,10 @@ function App() {
   const [retrying, setRetrying] = useState(false);
   const retryTimeout = useRef(null);
 
-  const fetchData = () => {
+  const fetchData = useCallback(() => {
     setLoading(true);
     setError('');
-    
+
     fetch('https://jsonplaceholder.typicode.com/posts')
       .then(response => {
         if (!response.ok) {
@@ -34,21 +34,35 @@ function App() {
           fetchData();
         }, 5000);
       });
-  };
+  }, []);
 
-  const cancelRetry = () => {
+  const cancelRetry = useCallback(() => {
     setRetrying(false);
     clearTimeout(retryTimeout.current);
-  };
+  }, []);
 
   useEffect(() => {
+    // Call API when component mounts
+    fetchData();
+
     return () => clearTimeout(retryTimeout.current);
-  }, []);
+  }, [fetchData]);
+
+  const renderedData = useMemo(() => {
+    if (!data) return null;
+
+    return (
+      <ul className="data-list">
+        {data.map((item) => (
+          <li key={item.id}>{item.title}</li>
+        ))}
+      </ul>
+    );
+  }, [data]);
 
   return (
     <div className="app-container">
       <h1>Movie App</h1>
-      <button className="fetch-btn" onClick={fetchData}>Fetch Data</button>
 
       {loading && <div className="spinner"></div>}
 
@@ -61,13 +75,7 @@ function App() {
         </div>
       )}
 
-      {data && (
-        <ul className="data-list">
-          {data.map((item) => (
-            <li key={item.id}>{item.title}</li>
-          ))}
-        </ul>
-      )}
+      {renderedData}
     </div>
   );
 }
