@@ -1,78 +1,103 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 
 function App() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const firebaseUrl = 'https://movie-app-ba885-default-rtdb.firebaseio.com/movies.json';
+  const firebaseBase = 'https://movie-app-ba885-default-rtdb.firebaseio.com/movies/';
+
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [retryIntervalId, setRetryIntervalId] = useState(null);
   const [newMovie, setNewMovie] = useState({ title: '', body: '' });
 
+  // Fetch movies
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('https://jsonplaceholder.typicode.com/posts');
+      const response = await fetch(firebaseUrl);
       if (!response.ok) {
-        throw new Error('Something went wrong');
+        throw new Error('Something went wrong while fetching movies.');
       }
-      const jsonData = await response.json();
-      setData(jsonData);
+      const moviesData = await response.json();
+      const loadedMovies = [];
+      for (const key in moviesData) {
+        loadedMovies.push({
+          id: key,
+          title: moviesData[key].title,
+          body: moviesData[key].body,
+        });
+      }
+      setData(loadedMovies.reverse());
     } catch (error) {
       setError(error.message);
-      console.error('API call failed:', error);
-    } finally {
-      setLoading(false);
     }
-  }, []);
+    setLoading(false);
+  }, [firebaseUrl]);
 
-  // Fetch data on page load
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  // Retry API call every 5 seconds if there is an error
-  useEffect(() => {
-    if (error) {
-      const intervalId = setInterval(() => {
-        console.log('Retrying API call...');
-        fetchData();
-      }, 5000);
-      setRetryIntervalId(intervalId);
-
-      return () => clearInterval(intervalId);
-    }
-  }, [error, fetchData]);
-
-  const cancelRetry = useCallback(() => {
-    if (retryIntervalId) {
-      clearInterval(retryIntervalId);
-      setRetryIntervalId(null);
-      console.log('Retry cancelled.');
-    }
-  }, [retryIntervalId]);
-
-  const handleInputChange = useCallback((e) => {
+  // Handle form input change
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewMovie(prev => ({ ...prev, [name]: value }));
-  }, []);
+    setNewMovie((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-  const handleAddMovie = useCallback(() => {
-    const movieWithId = {
-      ...newMovie,
-      id: data ? data.length + 1 : 1, // temporary id for display
+  // Add new movie and refetch
+  const handleAddMovie = useCallback(async () => {
+    const movieObj = {
+      title: newMovie.title,
+      body: newMovie.body,
     };
 
-    console.log('New Movie Object:', movieWithId);
+    console.log('New Movie Object:', movieObj);
 
-    // Update state to display the new movie immediately
-    setData(prevData => prevData ? [movieWithId, ...prevData] : [movieWithId]);
+    try {
+      const response = await fetch(firebaseUrl, {
+        method: 'POST',
+        body: JSON.stringify(movieObj),
+        headers: { 'Content-Type': 'application/json' },
+      });
 
-    // Reset form inputs
+      if (!response.ok) {
+        throw new Error('Something went wrong while adding movie.');
+      }
+
+      fetchData();
+    } catch (error) {
+      setError(error.message);
+      console.error('Failed to add movie:', error);
+    }
+
     setNewMovie({ title: '', body: '' });
-  }, [newMovie, data]);
+  }, [newMovie, firebaseUrl, fetchData]);
 
-  const memoizedMovies = useMemo(() => data, [data]);
+  // Delete movie
+  const handleDeleteMovie = useCallback(
+    async (id) => {
+      try {
+        const response = await fetch(`${firebaseBase}${id}.json`, {
+          method: 'DELETE',
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete movie.');
+        }
+
+        // Update UI by re-fetching data
+        fetchData();
+      } catch (error) {
+        setError(error.message);
+        console.error('Failed to delete movie:', error);
+      }
+    },
+    [firebaseBase, fetchData]
+  );
 
   return (
     <div className="App">
@@ -82,14 +107,14 @@ function App() {
         <input
           type="text"
           name="title"
-          placeholder="Title"
+          placeholder="Enter movie title"
           value={newMovie.title}
           onChange={handleInputChange}
         />
         <input
           type="text"
           name="body"
-          placeholder="Description"
+          placeholder="Enter movie description"
           value={newMovie.body}
           onChange={handleInputChange}
         />
@@ -97,23 +122,20 @@ function App() {
       </div>
 
       <button onClick={fetchData}>Fetch Movies</button>
-      {error && (
-        <div className="error">
-          <p>Something went wrong: {error}</p>
-          <button onClick={cancelRetry}>Cancel Retry</button>
-        </div>
-      )}
-      {loading ? (
-        <div className="spinner"></div>
-      ) : (
-        <ul>
-          {memoizedMovies && memoizedMovies.map(movie => (
-            <li key={movie.id}>
-              <strong>{movie.title}</strong>: {movie.body}
-            </li>
-          ))}
-        </ul>
-      )}
+
+      {loading && <p className="loading">Loading...</p>}
+      {error && <p className="error">❌ {error}</p>}
+
+      <ul className="movie-list">
+        {data.map((item) => (
+          <li key={item.id} className="movie-item">
+            <strong>{item.title}</strong>: {item.body}
+            <button onClick={() => handleDeleteMovie(item.id)} className="delete-button">
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

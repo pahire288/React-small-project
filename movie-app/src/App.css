@@ -1,58 +1,70 @@
 .App {
-  font-family: Arial, sans-serif;
   text-align: center;
+  font-family: Arial, sans-serif;
   padding: 20px;
 }
 
 .form-container {
-  display: flex;
-  justify-content: center;
   margin-bottom: 20px;
-  gap: 10px;
 }
 
 .form-container input {
   padding: 8px;
+  margin: 5px;
   width: 200px;
 }
 
 .form-container button {
   padding: 8px 16px;
+  margin: 5px;
+  cursor: pointer;
 }
 
 button {
+  padding: 8px 16px;
   margin: 10px;
-  padding: 10px 20px;
-  font-size: 16px;
+  cursor: pointer;
 }
 
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  text-align: left;
-  margin: 5px 0;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 5px;
-}
-
-.spinner {
-  border: 6px solid #f3f3f3;
-  border-top: 6px solid #555;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  animation: spin 1s linear infinite;
-  margin: auto;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.loading {
+  color: blue;
+  font-weight: bold;
 }
 
 .error {
   color: red;
-  margin: 10px;
+  font-weight: bold;
+}
+
+.movie-list {
+  list-style: none;
+  padding: 0;
+}
+
+.movie-item {
+  background: #f4f4f4;
+  margin: 10px auto;
+  padding: 10px;
+  width: 400px;
+  border-radius: 4px;
+  text-align: left;
+}
+
+
+.movie-item {
+  margin-bottom: 10px;
+}
+
+.delete-button {
+  margin-left: 10px;
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 5px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.delete-button:hover {
+  background-color: darkred;
 }
