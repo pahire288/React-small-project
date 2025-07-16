@@ -1,0 +1,30 @@
+.input{
+
+    height: 300px;
+    width: 200px;
+    position: fixed;
+    border: 1px solid brown;
+   margin-left: 40%;
+   margin-top: 10%;
+   display: flex;
+   flex-direction: column;
+}
+button{
+margin-top: 180px;
+width: 150px;
+    margin-left: 25px;}
+
+input{
+    margin-top: 20px;
+    width: 150px;
+    margin-left: 25px;
+}
+
+input:hover{
+    background-color: brown;
+}
+
+button:hover{
+    background-color: green;
+    
+}
