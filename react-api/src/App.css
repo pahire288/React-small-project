@@ -1,0 +1,26 @@
+.cards {
+    /* Center cards horizontally */
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(122, 49, 49, 0.1);
+  width: 300px;   /* Adjust width to fit 4-5 cards per row */
+  height: 400px;
+}
+
+.card:hover{
+    background-color: rgb(95, 105, 80);
+}
+
+button:hover{
+  background-color: rgb(236, 96, 96);
+}

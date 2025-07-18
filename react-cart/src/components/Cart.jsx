@@ -1,7 +1,7 @@
-import React from "react";
 
 
 const Cart = ({CartArray}) =>{
+
 
 
     return(<>
@@ -14,7 +14,10 @@ const Cart = ({CartArray}) =>{
 <div className="col-6 col-sm-4 col-md-3 col-lg-2 mb-3" key={index}>
             <div className="border rounded h-100 p-2 d-flex flex-column justify-content-between">
               <div className="text-center">
-                <img src={Item.img} alt={Item.model} className="img-fluid product-img" />
+                <img src={Item.img} alt={Item.model} className="img-fluid product-img" 
+                
+                style={{cursor:"pointer"}}
+                />
               </div>
               <div>
                 <p className="m-0 fw-bold">{Item.brand}</p>
@@ -29,6 +32,8 @@ const Cart = ({CartArray}) =>{
            )
         })
     }
+
+    
     </>);
 }
 
