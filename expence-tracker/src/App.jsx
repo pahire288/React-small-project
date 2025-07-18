@@ -15,6 +15,15 @@ function App() {
   const [showCompleteProfile, setShowCompleteProfile] = useState(false);
   const [profileUpdated, setProfileUpdated] = useState(false);
 
+  const handleLogout = () => {
+    localStorage.removeItem("idToken");
+    setIsLoggedIn(false);
+    setToken("");
+    setShowSignup(false);
+    setShowCompleteProfile(false);
+    setProfileUpdated(false);
+  };
+
   return (
     <div className="App">
       {!isLoggedIn ? (
@@ -37,6 +46,10 @@ function App() {
         </>
       ) : (
         <>
+          <button onClick={handleLogout} style={{ position: "absolute", top: "10px", right: "10px" }}>
+            Logout
+          </button>
+
           {!profileUpdated ? (
             showCompleteProfile ? (
               <CompleteProfile setProfileUpdated={setProfileUpdated} />
@@ -44,7 +57,7 @@ function App() {
               <ProfileIncomplete setShowCompleteProfile={setShowCompleteProfile} />
             )
           ) : (
-            <Welcome />
+            <Welcome setIsLoggedIn={setIsLoggedIn} />
           )}
         </>
       )}

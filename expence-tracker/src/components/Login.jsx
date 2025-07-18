@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebase";
 import Welcome from "./Welcome";
+import ForgotPassword from "./ForgotPassword";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -35,6 +37,10 @@ const Login = () => {
     return <Welcome setIsLoggedIn={setIsLoggedIn} />;
   }
 
+  if (showForgotPassword) {
+    return <ForgotPassword setShowForgotPassword={setShowForgotPassword} />;
+  }
+
   return (
     <div className="login-container">
       <form className="login-form" onSubmit={handleLogin}>
@@ -53,6 +59,13 @@ const Login = () => {
         /><br />
         <button type="submit">Login</button>
         {error && <p style={{ color: "red" }}>{error}</p>}
+        <button
+          type="button"
+          onClick={() => setShowForgotPassword(true)}
+          style={{ marginTop: "10px" }}
+        >
+          Forgot Password?
+        </button>
       </form>
     </div>
   );
