@@ -1,14 +1,13 @@
-// src/components/Login.jsx
-
 import React, { useState } from "react";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import app from "./firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "./firebase";
+import Welcome from "./Welcome";
 
-const Login = ({ setIsLoggedIn, setToken }) => {
-  const auth = getAuth(app);
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -20,18 +19,17 @@ const Login = ({ setIsLoggedIn, setToken }) => {
     }
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      const token = await user.getIdToken();
-
-      console.log("User logged in successfully. Token:", token);
-      setToken(token);
+      await signInWithEmailAndPassword(auth, email, password);
       setIsLoggedIn(true);
     } catch (err) {
       console.error(err);
       setError("Invalid email or password.");
     }
   };
+
+  if (isLoggedIn) {
+    return <Welcome />;
+  }
 
   return (
     <div className="login-container">
