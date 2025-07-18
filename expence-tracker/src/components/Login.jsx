@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebase";
-import Welcome from "./Welcome";
 import ForgotPassword from "./ForgotPassword";
 
-const Login = () => {
+const Login = ({ setIsLoggedIn, setToken }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const handleLogin = async (e) => {
@@ -26,16 +24,13 @@ const Login = () => {
       const token = await user.getIdToken();
 
       localStorage.setItem("idToken", token);
+      setToken(token);
       setIsLoggedIn(true);
     } catch (err) {
       console.error(err);
       setError("Invalid email or password.");
     }
   };
-
-  if (isLoggedIn) {
-    return <Welcome setIsLoggedIn={setIsLoggedIn} />;
-  }
 
   if (showForgotPassword) {
     return <ForgotPassword setShowForgotPassword={setShowForgotPassword} />;
