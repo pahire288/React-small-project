@@ -1,52 +1,118 @@
-// src/components/CompleteProfile.jsx
+import React, { useState, useEffect } from "react";
 
-import React, { useState } from "react";
-import { getAuth, updateProfile } from "firebase/auth";
-
-const CompleteProfile = ({ setProfileUpdated }) => {
-  const auth = getAuth();
+const CompleteProfile = () => {
   const [fullName, setFullName] = useState("");
-  const [photoURL, setPhotoURL] = useState("");
-  const [message, setMessage] = useState("");
+  const [profilePhoto, setProfilePhoto] = useState("");
+  const [idToken, setIdToken] = useState("");
 
-  const handleUpdateProfile = async (e) => {
+  // Get idToken from local storage when component mounts
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIdToken(token);
+
+    // Fetch user data from Firebase to prefill form
+    const fetchData = async () => {
+      if (!token) return;
+
+      try {
+        const res = await fetch(
+          `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyC44GiGCfzmvLH1iqYKqsyHuOjHYrEG_b0`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idToken: token }),
+          }
+        );
+        const data = await res.json();
+        console.log(data);
+
+        if (data.users && data.users.length > 0) {
+          const user = data.users[0];
+          setFullName(user.displayName || "");
+          setProfilePhoto(user.photoUrl || "");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleUpdate = async (e) => {
     e.preventDefault();
 
     try {
-      await updateProfile(auth.currentUser, {
-        displayName: fullName,
-        photoURL: photoURL,
-      });
-      console.log("Profile updated successfully");
-      setMessage("Profile updated successfully.");
-      setProfileUpdated(true);
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      setMessage("Failed to update profile.");
+      const res = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:update?key=AIzaSyC44GiGCfzmvLH1iqYKqsyHuOjHYrEG_b0`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            idToken,
+            displayName: fullName,
+            photoUrl: profilePhoto,
+            returnSecureToken: true,
+          }),
+        }
+      );
+      const data = await res.json();
+      console.log("Profile updated:", data);
+      alert("Profile updated successfully");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update profile");
     }
   };
 
   return (
-    <div className="complete-profile-container">
-      <form className="complete-profile-form" onSubmit={handleUpdateProfile}>
-        <h2>Complete Your Profile</h2>
+    <div style={styles.container}>
+      <h2>Complete Your Profile</h2>
+      <form onSubmit={handleUpdate} style={styles.form}>
         <input
           type="text"
           placeholder="Full Name"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
-        /><br />
+          style={styles.input}
+        />
         <input
           type="text"
           placeholder="Profile Photo URL"
-          value={photoURL}
-          onChange={(e) => setPhotoURL(e.target.value)}
-        /><br />
-        <button type="submit">Update</button>
-        {message && <p>{message}</p>}
+          value={profilePhoto}
+          onChange={(e) => setProfilePhoto(e.target.value)}
+          style={styles.input}
+        />
+        <button type="submit" style={styles.button}>Update</button>
       </form>
     </div>
   );
+};
+
+const styles = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    marginTop: "50px",
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    width: "300px",
+  },
+  input: {
+    marginBottom: "10px",
+    padding: "10px",
+    fontSize: "16px",
+  },
+  button: {
+    padding: "10px",
+    fontSize: "16px",
+    backgroundColor: "blue",
+    color: "white",
+    border: "none",
+  },
 };
 
 export default CompleteProfile;
