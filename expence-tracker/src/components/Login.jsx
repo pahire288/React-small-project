@@ -19,7 +19,11 @@ const Login = () => {
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const token = await user.getIdToken();
+
+      localStorage.setItem("idToken", token);
       setIsLoggedIn(true);
     } catch (err) {
       console.error(err);
@@ -28,7 +32,7 @@ const Login = () => {
   };
 
   if (isLoggedIn) {
-    return <Welcome />;
+    return <Welcome setIsLoggedIn={setIsLoggedIn} />;
   }
 
   return (

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { auth } from "./firebase";
-import { sendEmailVerification } from "firebase/auth";
+import { sendEmailVerification, signOut } from "firebase/auth";
 
-const Welcome = () => {
+const Welcome = ({ setIsLoggedIn }) => {
   const user = auth.currentUser;
   const [message, setMessage] = useState("");
 
@@ -26,8 +26,31 @@ const Welcome = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      localStorage.removeItem("idToken");
+      setIsLoggedIn(false);
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
+    <div style={{ textAlign: "center", marginTop: "50px" }}>
+      <button
+        onClick={handleLogout}
+        style={{
+          position: "absolute",
+          top: "10px",
+          right: "10px",
+          padding: "8px 16px",
+          cursor: "pointer"
+        }}
+      >
+        Logout
+      </button>
+
       <h2>Welcome, {user?.email}</h2>
       <p>Email verified: {user?.emailVerified ? "Yes ✅" : "No ❌"}</p>
 
