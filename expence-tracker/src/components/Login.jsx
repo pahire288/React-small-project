@@ -1,69 +1,45 @@
 import React, { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebase";
-import ForgotPassword from "./ForgotPassword";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
-const Login = ({ setIsLoggedIn, setToken }) => {
+function Login({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
-  const handleLogin = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setError("");
 
-    if (!email || !password) {
-      setError("All fields are required.");
-      return;
-    }
-
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      const token = await user.getIdToken();
-
-      localStorage.setItem("idToken", token);
-      setToken(token);
-      setIsLoggedIn(true);
-    } catch (err) {
-      console.error(err);
-      setError("Invalid email or password.");
-    }
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        onLogin(userCredential.user);
+      })
+      .catch((err) => setError(err.message));
   };
 
-  if (showForgotPassword) {
-    return <ForgotPassword setShowForgotPassword={setShowForgotPassword} />;
-  }
-
   return (
-    <div className="login-container">
-      <form className="login-form" onSubmit={handleLogin}>
-        <h2>Login</h2>
+    <div>
+      <h2>Login</h2>
+      <form onSubmit={handleSubmit}>
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-        /><br />
+          required
+        /><br/>
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-        /><br />
+          required
+        /><br/>
         <button type="submit">Login</button>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <button
-          type="button"
-          onClick={() => setShowForgotPassword(true)}
-          style={{ marginTop: "10px" }}
-        >
-          Forgot Password?
-        </button>
+        {error && <p style={{color:"red"}}>{error}</p>}
       </form>
     </div>
   );
-};
+}
 
 export default Login;

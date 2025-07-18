@@ -1,43 +1,64 @@
-import React, { useState } from "react";
-import Signup from "./components/Signup";
-import Login from "./components/Login";
+import React, { useEffect, useState } from "react";
+import { db, auth } from "./components/firebase";
+import { ref, onValue } from "firebase/database";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import ExpenseForm from "./components/ExpenseForm";
-import "./App.css";
+import Login from "./components/Login";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [token, setToken] = useState("");
-  const [showSignup, setShowSignup] = useState(false);
+  const [expenses, setExpenses] = useState([]);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribeAuth();
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const expensesRef = ref(db, "expenses");
+    const unsubscribe = onValue(expensesRef, (snapshot) => {
+      const data = snapshot.val();
+      const loadedExpenses = [];
+
+      for (let id in data) {
+        loadedExpenses.push({
+          id,
+          ...data[id],
+        });
+      }
+
+      setExpenses(loadedExpenses);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  const handleLogout = () => {
+    signOut(auth);
+  };
+
+  if (!user) {
+    return <Login onLogin={setUser} />;
+  }
 
   return (
-    <div className="App">
-      {!isLoggedIn ? (
-        <>
-          {showSignup ? (
-            <>
-              <Signup />
-              <p
-                onClick={() => setShowSignup(false)}
-                style={{ cursor: "pointer", color: "blue" }}
-              >
-                Already have an account? Login
-              </p>
-            </>
-          ) : (
-            <>
-              <Login setIsLoggedIn={setIsLoggedIn} setToken={setToken} />
-              <p
-                onClick={() => setShowSignup(true)}
-                style={{ cursor: "pointer", color: "blue" }}
-              >
-                Don't have an account? Signup
-              </p>
-            </>
-          )}
-        </>
-      ) : (
-        <ExpenseForm />
-      )}
+    <div>
+      <h1>Expense Tracker</h1>
+      <p>Welcome, {user.email} <button onClick={handleLogout}>Logout</button></p>
+
+      <ExpenseForm />
+      <ul>
+        {expenses.map((exp) => (
+          <li key={exp.id}>
+            {exp.amount} - {exp.description} ({exp.category})
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

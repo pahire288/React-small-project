@@ -1,63 +1,60 @@
 import React, { useState } from "react";
+import { db } from "./firebase";
+import { ref, push } from "firebase/database";
 
-function ExpenseForm() {
+function ExpenseForm({ onAddExpense }) {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("Food");
-  const [expenses, setExpenses] = useState([]);
+  const [category, setCategory] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     const newExpense = {
       amount,
       description,
       category
     };
-    setExpenses([...expenses, newExpense]);
-    setAmount("");
-    setDescription("");
-    setCategory("Food");
+
+    try {
+      // Push data to Realtime Database
+      await push(ref(db, "expenses"), newExpense);
+      console.log("Expense saved to Realtime Database");
+
+      // Optional: update local state via props callback
+      onAddExpense(newExpense);
+
+      // Clear input fields
+      setAmount("");
+      setDescription("");
+      setCategory("");
+    } catch (error) {
+      console.error("Error saving expense: ", error);
+    }
   };
 
   return (
-    <div>
-      <h2>Add Daily Expense</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="number"
-          placeholder="Amount spent"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-        />
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          required
-        >
-          <option value="Food">Food</option>
-          <option value="Petrol">Petrol</option>
-          <option value="Salary">Salary</option>
-        </select>
-        <button type="submit">Add Expense</button>
-      </form>
-
-      <h3>Expenses List</h3>
-      <ul>
-        {expenses.map((expense, index) => (
-          <li key={index}>
-            Rs. {expense.amount} - {expense.description} ({expense.category})
-          </li>
-        ))}
-      </ul>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <input
+        type="number"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        placeholder="Amount"
+      />
+      <input
+        type="text"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        placeholder="Description"
+      />
+      <input
+        type="text"
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        placeholder="Category"
+      />
+      <button type="submit">Add Expense</button>
+    </form>
   );
 }
 
