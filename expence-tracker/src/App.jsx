@@ -4,12 +4,16 @@ import React, { useState } from "react";
 import Signup from "./components/Signup";
 import Login from "./components/Login";
 import Welcome from "./components/Welcome";
+import ProfileIncomplete from "./components/ProfileIncomplete";
+import CompleteProfile from "./components/CompleteProfile";
 import "./App.css";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [token, setToken] = useState("");
   const [showSignup, setShowSignup] = useState(false);
+  const [showCompleteProfile, setShowCompleteProfile] = useState(false);
+  const [profileUpdated, setProfileUpdated] = useState(false);
 
   return (
     <div className="App">
@@ -32,7 +36,17 @@ function App() {
           )}
         </>
       ) : (
-        <Welcome />
+        <>
+          {!profileUpdated ? (
+            showCompleteProfile ? (
+              <CompleteProfile setProfileUpdated={setProfileUpdated} />
+            ) : (
+              <ProfileIncomplete setShowCompleteProfile={setShowCompleteProfile} />
+            )
+          ) : (
+            <Welcome />
+          )}
+        </>
       )}
     </div>
   );
