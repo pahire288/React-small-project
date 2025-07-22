@@ -1,24 +1,43 @@
-import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { increaseQuantity, decreaseQuantity } from "../store/cartSlice";
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { removeItem } from '../features/cartSlice';
 
-const Cart = () => {
+function Cart() {
   const cartItems = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
 
+  const handleRemove = (itemId) => {
+    dispatch(removeItem(itemId));
+  };
+
+  const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.count, 0);
+
+  const cartStyle = {
+    backgroundColor: 'white',
+    padding: '20px',
+    borderRadius: '8px',
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+    width: '300px',
+    marginTop: '20px',
+  };
+
   return (
-    <div>
-      <h2>My Cart</h2>
-      {cartItems.length === 0 && <p>Cart is empty</p>}
-      {cartItems.map(item => (
-        <div key={item.id} style={{ border: "1px solid gray", margin: "5px", padding: "5px" }}>
-          <p>{item.name} - ₹{item.price} x {item.quantity}</p>
-          <button onClick={() => dispatch(increaseQuantity(item.id))}>+</button>
-          <button onClick={() => dispatch(decreaseQuantity(item.id))}>-</button>
-        </div>
-      ))}
+    <div style={cartStyle}>
+      <h2>Cart</h2>
+      {cartItems.length === 0 ? (
+        <p>No items in cart</p>
+      ) : (
+        cartItems.map(item => (
+          <div key={item.id} style={{ marginBottom: '10px' }}>
+            <p>{item.name} x {item.count}</p>
+            <p>${item.price * item.count}</p>
+            <button onClick={() => handleRemove(item.id)}>Remove</button>
+          </div>
+        ))
+      )}
+      <h3>Total: ${totalPrice}</h3>
     </div>
   );
-};
+}
 
 export default Cart;
