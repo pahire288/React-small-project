@@ -2,6 +2,7 @@
 
 const initialState = {
   count: 0,
+  isAuthenticated: false, // ✅ added
 };
 
 const counterReducer = (state = initialState, action) => {
@@ -15,6 +16,16 @@ const counterReducer = (state = initialState, action) => {
       return {
         ...state,
         count: state.count - 5,
+      };
+    case 'LOGIN':
+      return {
+        ...state,
+        isAuthenticated: true,
+      };
+    case 'LOGOUT':
+      return {
+        ...state,
+        isAuthenticated: false,
       };
     default:
       return state;
