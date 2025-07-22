@@ -28,7 +28,7 @@ function App() {
         onClick={() => dispatch({ type: 'DECREMENT' })}
         style={{ margin: '10px' }}
       >
-        Decrement by 1
+        Decrement by 5
       </button>
     </div>
   );
