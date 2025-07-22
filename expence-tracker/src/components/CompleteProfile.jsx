@@ -5,12 +5,10 @@ const CompleteProfile = () => {
   const [profilePhoto, setProfilePhoto] = useState("");
   const [idToken, setIdToken] = useState("");
 
-  // Get idToken from local storage when component mounts
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIdToken(token);
 
-    // Fetch user data from Firebase to prefill form
     const fetchData = async () => {
       if (!token) return;
 
@@ -24,15 +22,13 @@ const CompleteProfile = () => {
           }
         );
         const data = await res.json();
-        console.log(data);
-
         if (data.users && data.users.length > 0) {
           const user = data.users[0];
           setFullName(user.displayName || "");
           setProfilePhoto(user.photoUrl || "");
         }
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching profile data:", err);
       }
     };
 
@@ -60,7 +56,7 @@ const CompleteProfile = () => {
       console.log("Profile updated:", data);
       alert("Profile updated successfully");
     } catch (err) {
-      console.error(err);
+      console.error("Profile update failed:", err);
       alert("Failed to update profile");
     }
   };

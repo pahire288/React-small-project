@@ -30,7 +30,7 @@ const ForgotPassword = ({ setShowForgotPassword }) => {
   };
 
   return (
-    <div className="forgot-password-container" style={{ textAlign: "center", marginTop: "50px" }}>
+    <div style={{ textAlign: "center", marginTop: "50px" }}>
       <h2>Forgot Password</h2>
       <form onSubmit={handlePasswordReset}>
         <input

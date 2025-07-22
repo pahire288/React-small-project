@@ -1,35 +1,30 @@
-import React, { useState } from "react";
-import { db } from "./firebase";
+import React, { useState, useContext } from "react";
+import { db } from "../firebase";
 import { ref, push } from "firebase/database";
+import { ExpensesContext } from "../context/ExpensesContext";
 
-function ExpenseForm({ onAddExpense }) {
+function ExpenseForm() {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
+  const { dispatch } = useContext(ExpensesContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newExpense = {
-      amount,
-      description,
-      category
-    };
+    const newExpense = { amount, description, category };
 
     try {
-      // Push data to Realtime Database
       await push(ref(db, "expenses"), newExpense);
-      console.log("Expense saved to Realtime Database");
+      console.log("Expense saved successfully");
 
-      // Optional: update local state via props callback
-      onAddExpense(newExpense);
+      dispatch({ type: "ADD_EXPENSE", payload: newExpense });
 
-      // Clear input fields
       setAmount("");
       setDescription("");
       setCategory("");
     } catch (error) {
-      console.error("Error saving expense: ", error);
+      console.error("Error saving expense:", error);
     }
   };
 
