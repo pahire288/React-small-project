@@ -11,6 +11,7 @@ const App = () => {
   const dispatch = useDispatch();
   const cartItems = useSelector(state => state.cart.items);
   const [notification, setNotification] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // 🔵 Load cart from firebase on first load
   useEffect(() => {
@@ -20,7 +21,17 @@ const App = () => {
       if (data) {
         dispatch(setCart(data));
         console.log("Fetched cart from firebase:", data);
+        setNotification("Cart loaded from Firebase ✅");
+      } else {
+        setNotification("No cart data found in Firebase.");
       }
+      setLoading(false);
+      setTimeout(() => setNotification(""), 3000);
+    }, (error) => {
+      console.error("Error fetching from firebase:", error);
+      setNotification("Error loading cart ❌");
+      setLoading(false);
+      setTimeout(() => setNotification(""), 3000);
     });
   }, [dispatch]);
 
@@ -28,23 +39,15 @@ const App = () => {
   useEffect(() => {
     const saveCartToFirebase = async () => {
       try {
+        setNotification("Saving cart data...");
         await set(ref(database, 'cart/'), cartItems);
         console.log("Cart data saved to firebase");
-
-        // ✅ Show success notification
-        setNotification("Cart data saved successfully!");
-        setTimeout(() => {
-          setNotification("");
-        }, 3000);
-
+        setNotification("Cart data saved successfully ✅");
       } catch (error) {
         console.error("Error saving to firebase:", error);
-
-        // ❌ Show error notification
-        setNotification("Error saving cart data.");
-        setTimeout(() => {
-          setNotification("");
-        }, 3000);
+        setNotification("Error saving cart data ❌");
+      } finally {
+        setTimeout(() => setNotification(""), 3000);
       }
     };
 
@@ -78,15 +81,20 @@ const App = () => {
           {notification}
         </div>
       )}
-      <div style={appStyle}>
-        <div>
-          <h1>Products</h1>
-          {products.map(product => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+
+      {loading ? (
+        <p style={{ textAlign: 'center', marginTop: '50px' }}>Loading cart data...</p>
+      ) : (
+        <div style={appStyle}>
+          <div>
+            <h1>Products</h1>
+            {products.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+          <Cart />
         </div>
-        <Cart />
-      </div>
+      )}
     </>
   );
 };
